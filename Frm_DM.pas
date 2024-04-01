@@ -6,7 +6,10 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
   System.Classes, Vcl.Graphics, System.Diagnostics, Vcl.Controls, Vcl.Forms,
   Vcl.Dialogs, AdvMetroTaskDialog, Vcl.ExtCtrls, AdvSmoothPopup, Math,
-  AdvSmoothSplashScreen;
+  AdvSmoothSplashScreen, GDIPPictureContainer;
+
+
+
 
 type
   TDM = class(TDataModule)
@@ -14,6 +17,7 @@ type
     TaskDialog: TAdvMetroTaskDialog;
     InputTaskDialog: TAdvInputMetroTaskDialog;
     SP: TAdvSmoothSplashScreen;
+    GDIPPictureContainer1: TGDIPPictureContainer;
     procedure TaskDialogDialogProgress(Sender: TObject; var Pos: Integer; var State: TTaskDialogProgressState);
     procedure TaskDialogDialogButtonClick(Sender: TObject; ButtonID: Integer);
   private
@@ -23,7 +27,6 @@ type
   public
     function ShowInputBox(iCaption, iTitle, iSubTitle, iInputText: string; iIcon: TTaskDialogIcon; iButtons: TCommonButtons): string;
     function ShowMsgBox(iCaption, iTitle, iSubTitle: string; iIcon: TTaskDialogIcon; iButtons: TCommonButtons; iTimeOut: Integer): Boolean;
-    function FileVersionGet(const sgFileName: string): string;
     procedure DelayMS(MS: Integer);
 
     { Public declarations }
@@ -31,19 +34,6 @@ type
 
 var
   DM: TDM;
-  ReqRxLen: Integer = 19;
-  RxCnt: Integer = 0;
-  bRx: Boolean = False;
-  bTimeOut: Boolean = False;
-  bACK1: Boolean = False;
-  bOut_Display: Boolean = True;
-  bOut_Total: Boolean = False;
-  TCP_DATA: string = '';
-  Ip: string;
-  Port: Integer;
-  PeerIP: string;
-  PeerPort: Integer;
-  ReceiveSTR: string = '';
   ST: TStopwatch;
 
 implementation
@@ -52,6 +42,7 @@ implementation
 
 uses
   Form_Main;
+
 {$R *.dfm}
 
 procedure TDM.DelayMS(MS: Integer);
@@ -62,37 +53,6 @@ begin
   repeat
     Application.ProcessMessages;
   until ((GetTickCount - PastCount) >= LongInt(MS));
-end;
-
-function TDM.FileVersionGet(const sgFileName: string): string;
-var
-  infoSize: DWORD;
-var
-  verBuf: Pointer;
-var
-  verSize: UINT;
-var
-  wnd: UINT;
-var
-  FixedFileInfo: PVSFixedFileInfo;
-begin
-  infoSize := GetFileVersionInfoSize(PChar(sgFileName), wnd);
-
-  result := '';
-
-  if infoSize <> 0 then begin
-    GetMem(verBuf, infoSize);
-    try
-      if GetFileVersionInfo(PChar(sgFileName), wnd, infoSize, verBuf) then begin
-        VerQueryValue(verBuf, '\', Pointer(FixedFileInfo), verSize);
-
-        result := IntToStr(FixedFileInfo.dwFileVersionMS div $10000) + '.' +
-          IntToStr(FixedFileInfo.dwFileVersionMS and $0FFFF) + '.' + IntToStr(FixedFileInfo.dwFileVersionLS div $10000) + '.' + IntToStr(FixedFileInfo.dwFileVersionLS and $0FFFF);
-      end;
-    finally
-      FreeMem(verBuf);
-    end;
-  end;
 end;
 
 procedure TDM.TaskDialogDialogButtonClick(Sender: TObject; ButtonID: Integer);
@@ -119,7 +79,7 @@ function TDM.ShowInputBox(iCaption, iTitle, iSubTitle, iInputText: string; iIcon
 begin
   DM.InputTaskDialog.InputText := '';
   if Assigned(Frm_Main) then
-    Frm_Main.AlphaBlendValue := 200;
+    Frm_Main.AlphaBlendValue := 180;
   DM.InputTaskDialog.CollapsControlText := '';
   DM.InputTaskDialog.InputText := iInputText;
   DM.InputTaskDialog.ExpandedText := '';
@@ -145,13 +105,9 @@ end;
 
 function TDM.ShowMsgBox(iCaption, iTitle, iSubTitle: string; iIcon: TTaskDialogIcon; iButtons: TCommonButtons; iTimeOut: Integer): Boolean;
 begin
-
   TaskDialog.Tag := 0;
   result := False;
-  if Assigned(Frm_Main) then begin
-    Frm_Main.AlphaBlend := True;
-    Frm_Main.AlphaBlendValue := 200;
-  end;
+
   TaskDialog.AutoCloseTimeOut := iTimeOut;
   DM.TaskDialog.CollapsControlText := '';
   DM.TaskDialog.ExpandedText := '';
@@ -172,6 +128,11 @@ begin
     TaskDialog.AutoClose := True;
   end;
 
+  if Assigned(Frm_Main) then begin
+    Frm_Main.AlphaBlend := True;
+    Frm_Main.AlphaBlendValue := 200;
+  end;
+
   ST.Reset;
   ST.Start;
   DM.TaskDialog.Execute;
@@ -184,5 +145,6 @@ begin
     Frm_Main.AlphaBlendValue := 255;
   end;
 end;
+
 end.
 

@@ -6,7 +6,7 @@
         <MainSource>Donga_UI.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win64</Platform>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -70,7 +70,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
-        <Custom_Styles>Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf</Custom_Styles>
+        <Custom_Styles>Glossy|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glossy.vsf;Sky|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Sky.vsf</Custom_Styles>
         <SanitizedProjectName>Donga_UI</SanitizedProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
@@ -144,6 +144,11 @@
             <Form>DM</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
+        <DCCReference Include="Common.pas"/>
+        <DCCReference Include="Unit1.pas">
+            <Form>Form1</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -176,8 +181,14 @@
                 </Source>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="Win32\Debug\Donga_UI.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\Donga_UI.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
+                        <RemoteName>Donga_UI.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\Donga_UI.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
                         <RemoteName>Donga_UI.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
